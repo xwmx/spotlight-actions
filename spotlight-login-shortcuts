@@ -291,7 +291,7 @@ _create_sleep_shortcut() {
 ###############################################################################
 # _create_log_out_shortcut()
 #
-# Create an application that sends the system to sleep.
+# Create an application that logs out the current user.
 _create_log_out_shortcut() {
   local _temp_file_path
   _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
