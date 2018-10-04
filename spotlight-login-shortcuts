@@ -1,0 +1,310 @@
+#!/usr/bin/env bash
+###############################################################################
+# spotlight-login-shortcuts
+#
+# Use Spotlight on macOS for fast user switching, opening the login window, and
+# other account operations.
+#
+# https://github.com/alphabetum/spotlight-login-shortcuts
+#
+# Copyright (c) 2018 William Melody • hi@williammelody.com
+###############################################################################
+
+###############################################################################
+# Strict Mode
+###############################################################################
+
+set -o nounset
+set -o errexit
+set -o pipefail
+IFS=$'\n\t'
+
+###############################################################################
+# Environment
+###############################################################################
+
+export _TARGET_DIRECTORY
+_TARGET_DIRECTORY="/Applications/Spotlight Shortcuts"
+
+###############################################################################
+# Utilities
+###############################################################################
+
+_command_exists() {
+  hash "${1}" 2>/dev/null
+}
+
+# _debug()
+#
+# Usage:
+#   _debug printf "Debug info. Variable: %s\\n" "$0"
+#
+# A simple function for executing a specified command if the `$_USE_DEBUG`
+# variable has been set. The command is expected to print a message and
+# should typically be either `echo`, `printf`, or `cat`.
+__DEBUG_COUNTER=0
+_debug() {
+  if [[ "${_USE_DEBUG:-"0"}" -eq 1 ]]
+  then
+    __DEBUG_COUNTER=$((__DEBUG_COUNTER+1))
+    # Prefix debug message with "bug (U+1F41B)"
+    printf "🐛  %s " "${__DEBUG_COUNTER}"
+    "${@}"
+    printf "――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――\\n"
+  fi
+}
+
+_log_success() {
+  if [[ -n "${1:-}" ]]
+  then
+    printf "✅ %s\\n" "${1}"
+  fi
+}
+
+_trash_or_rm() {
+  local _command="rm -r"
+  if _command_exists "trash"
+  then
+    _command="trash"
+  fi
+
+  if [[ -n "${1:-}" ]] && [[ -e "${1}" ]]
+  then
+    "${_command}" "${1}"
+  fi
+}
+
+###############################################################################
+# Validations
+###############################################################################
+
+_require_accounts_executable() {
+  if ! _command_exists "accounts"
+  then
+    cat <<HEREDOC
+$(basename "$0") depends on \`accounts\`. More information:
+https://github.com/alphabetum/accounts
+HEREDOC
+    exit 1
+  fi
+} && _require_accounts_executable
+
+
+###############################################################################
+# Templates
+###############################################################################
+
+# _ACCOUNT_SCRIPT_TEMPLATE
+#
+# Script template for creating an app that logs in as the user with the same
+# name as the app..
+export _ACCOUNT_SCRIPT_TEMPLATE
+read -r -d '' _ACCOUNT_SCRIPT_TEMPLATE <<HEREDOC || true
+#!/usr/bin/env bash
+_switch_to_the_user_with_the_same_name_as_this_app_bundle() {
+  # Get username from the application bundle name.
+  local _username="\$(
+    ps -o comm= \$PPID \
+    | grep -oh '[^/]\+.app' \
+    | sed -e 's/.app//' \
+    | sed -e 's/MacOS//'
+  )"
+  local _user_id=\$(id -u "\${_username}")
+  local _dialog_message
+
+  if [[ -z "\${_user_id:-}" ]]
+  then
+    read -r -d '' "_dialog_message" <<DIALOG_MESSAGE_HEREDOC
+No user named '\${_username}' found. To recreate shortcuts run:
+  spotlight-login-shortcuts
+DIALOG_MESSAGE_HEREDOC
+    osascript -e "display dialog \"\${_dialog_message}\""
+  elif [[ "\$(whoami)" == "\${_username}" ]]
+  then
+    osascript -e "display dialog \"Already logged in to '\${_username}'.\""
+  else
+    "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession" -switchToUserID "\${_user_id}"
+  fi
+} && _switch_to_the_user_with_the_same_name_as_this_app_bundle
+HEREDOC
+
+# _APPLESCRIPT_APP_TEMPLATE
+#
+# Generic wrapper template for running a shell script in an app bundle.
+export _APPLESCRIPT_APP_TEMPLATE
+read -r -d '' _APPLESCRIPT_APP_TEMPLATE <<HEREDOC || true
+#!/usr/bin/osascript
+set current_path to (path to me)
+do shell script "."  & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/shellscript"
+HEREDOC
+
+# _APPLESCRIPT_SLEEP_APP_TEMPLATE
+#
+# AppleScript template for an app that makes the computer sleep.
+export _APPLESCRIPT_SLEEP_APP_TEMPLATE
+read -r -d '' _APPLESCRIPT_SLEEP_APP_TEMPLATE <<HEREDOC || true
+#!/usr/bin/osascript
+tell application "Finder"
+sleep
+end tell
+HEREDOC
+
+# _ACCOUNT_SCRIPT_TEMPLATE
+#
+# Script template for creating an app that logs in as the user with the same
+# name as the app..
+export _LOGIN_WINDOW_SCRIPT_TEMPLATE
+read -r -d '' _LOGIN_WINDOW_SCRIPT_TEMPLATE <<HEREDOC || true
+#!/usr/bin/env bash
+_go_to_login_window() {
+  "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession" -suspend
+} && _go_to_login_window
+HEREDOC
+
+###############################################################################
+# Primary Functions
+###############################################################################
+
+###############################################################################
+# _create_target_directory()
+#
+# Create the target directory that will contain the appllication bundles.
+_create_target_directory() {
+  if [[ ! -d "${_TARGET_DIRECTORY}" ]]
+  then
+    local _dialog_message
+    read -r -d '' _dialog_message <<HEREDOC || true
+"${_TARGET_DIRECTORY}" not found. Would you like to create it? [y/N] 
+HEREDOC
+
+    while true
+    do
+      read -r -p "${_dialog_message}" _yn
+
+      case "${_yn}" in
+        [Yy]* )
+          break
+          ;;
+        * )
+          printf "Exiting...\\n"
+          exit 0
+          ;;
+      esac
+    done
+
+    mkdir -p "${_TARGET_DIRECTORY}"
+  fi
+
+  if [[ -d "${_TARGET_DIRECTORY}" ]]
+  then
+    _log_success "\"${_TARGET_DIRECTORY}\""
+  fi
+} && _create_target_directory
+
+###############################################################################
+# _create_shortcuts_for_accounts
+#
+# Create an app for each account that brings up the login window for that
+# account.
+_debug "Starting \`_create_shortcuts_for_accounts()\`\\n"
+_create_shortcuts_for_accounts() {
+
+  local _accounts
+  _accounts="$(accounts list)"
+
+  for __account in ${_accounts[@]}
+  do
+    local _temp_file_path
+    _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+    printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
+
+    if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
+    then
+      local _target_app_path="${_TARGET_DIRECTORY}/${__account}.app"
+      _trash_or_rm "${_target_app_path}"
+
+      osacompile -o "${_target_app_path}" "${_temp_file_path}"
+      local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/shellscript"
+      printf "%s\\n" "${_ACCOUNT_SCRIPT_TEMPLATE}" > "${_target_app_script_path}"
+      chmod +x "${_target_app_script_path}"
+
+      cp \
+        "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserIcon.icns" \
+        "${_target_app_path}/Contents/Resources/applet.icns"
+      _log_success "\"${_target_app_path}\""
+    fi
+
+    rm "${_temp_file_path}"
+  done
+} && _create_shortcuts_for_accounts
+
+###############################################################################
+# _create_login_window_shortcut()
+#
+# Create an application that opens the login window.
+_create_login_window_shortcut() {
+  local _temp_file_path
+  _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+  printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
+
+  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
+  then
+    local _target_app_path="${_TARGET_DIRECTORY}/Login Window.app"
+    _trash_or_rm "${_target_app_path}"
+
+    osacompile -o "${_target_app_path}" "${_temp_file_path}"
+    local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/shellscript"
+    printf "%s\\n" "${_LOGIN_WINDOW_SCRIPT_TEMPLATE}" > "${_target_app_script_path}"
+    chmod +x "${_target_app_script_path}"
+
+    cp \
+      "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GroupIcon.icns" \
+      "${_target_app_path}/Contents/Resources/applet.icns"
+    _log_success "\"${_target_app_path}\""
+  fi
+
+  rm "${_temp_file_path}"
+} && _create_login_window_shortcut
+
+###############################################################################
+# _create_sleep_shortcut()
+#
+# Create an application that sends the system to sleep.
+_create_sleep_shortcut() {
+  local _temp_file_path
+  _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+  printf "%s\\n" "${_APPLESCRIPT_SLEEP_APP_TEMPLATE}" > "${_temp_file_path}"
+
+  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
+  then
+    local _target_app_path="${_TARGET_DIRECTORY}/Sleep.app"
+    _trash_or_rm "${_target_app_path}"
+
+    osacompile -o "${_target_app_path}" "${_temp_file_path}"
+    _log_success "\"${_target_app_path}\""
+  fi
+
+  rm "${_temp_file_path}"
+} && _create_sleep_shortcut
+
+
+###############################################################################
+# _create_log_out_shortcut()
+#
+# Create an application that sends the system to sleep.
+_create_log_out_shortcut() {
+  local _temp_file_path
+  _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+  printf "tell app \"System Events\" to log out" > "${_temp_file_path}"
+
+  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
+  then
+    local _target_app_path="${_TARGET_DIRECTORY}/Log Out.app"
+    _trash_or_rm "${_target_app_path}"
+
+    osacompile -o "${_target_app_path}" "${_temp_file_path}"
+    _log_success "\"${_target_app_path}\""
+  fi
+
+  rm "${_temp_file_path}"
+} && _create_log_out_shortcut
