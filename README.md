@@ -22,5 +22,4 @@ All applications are installed in `/Applications/Spotlight Shortcuts`.
 
 ## Usage
 
-1. Install https://github.com/alphabetum/accounts
-2. Run `spotlight-login-shortcuts` from the terminal to generate the application bundles in `/Applications/Spotlight Shortcuts`
+Simply download and run `spotlight-login-shortcuts` from the terminal to generate the application bundles in `/Applications/Spotlight Shortcuts`

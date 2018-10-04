@@ -75,22 +75,6 @@ _trash_or_rm() {
 }
 
 ###############################################################################
-# Validations
-###############################################################################
-
-_require_accounts_executable() {
-  if ! _command_exists "accounts"
-  then
-    cat <<HEREDOC
-$(basename "$0") depends on \`accounts\`. More information:
-https://github.com/alphabetum/accounts
-HEREDOC
-    exit 1
-  fi
-} && _require_accounts_executable
-
-
-###############################################################################
 # Templates
 ###############################################################################
 
@@ -208,19 +192,40 @@ HEREDOC
 # account.
 _debug "Starting \`_create_shortcuts_for_accounts()\`\\n"
 _create_shortcuts_for_accounts() {
+  local _users_and_ids
+  _users_and_ids=($(dscl . list /Users uid | grep -v '^_'))
 
-  local _accounts
-  _accounts="$(accounts list)"
-
-  for __account in ${_accounts[@]}
+  for __user in ${_users_and_ids[@]}
   do
+    local _username
+    _username="$(echo "${__user}" | awk '{print $1}')"
+
+    # Only print users with valid home directories, which is used here as an
+    # indication that the account is a valid login account. So far I've been
+    # unable to find a better way to list only full login user accounts.
+    local _home_directory
+    _home_directory="$(
+      dscl . -read "/Users/${_username}" NFSHomeDirectory | \
+        awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'
+    )"
+
+    # Skip system users
+    if [[ "${_username}" == "root" ]]         ||
+       [[ "${_username}" == "daemon" ]]       ||
+       [[ "${_home_directory}" =~ ^/var.* ]]  ||
+       [[ "${_home_directory}" =~ ^/dev.* ]]  ||
+       [[ "${_home_directory}" =~ ^/opt.* ]]
+    then
+      continue
+    fi
+
     local _temp_file_path
     _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
     printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
 
     if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
     then
-      local _target_app_path="${_TARGET_DIRECTORY}/${__account}.app"
+      local _target_app_path="${_TARGET_DIRECTORY}/${_username}.app"
       _trash_or_rm "${_target_app_path}"
 
       osacompile -o "${_target_app_path}" "${_temp_file_path}"
