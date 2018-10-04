@@ -18,7 +18,7 @@ including:
 
 ![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-login-shortcuts/master/images/login%20window.png)
 
-All applications are installed in `/Application/Spotlight Shortcuts`.
+All applications are installed in `/Applications/Spotlight Shortcuts`.
 
 ## Usage
 
