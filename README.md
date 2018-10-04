@@ -8,6 +8,8 @@ When one these applications is launched with Spotlight, the login window
 for that account is opened, just as if the account is selected in the
 menu bar dropdown.
 
+![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-login-shortcuts/master/images/username.png)
+
 Additional applications are created for other account operations
 including:
 
@@ -17,6 +19,8 @@ including:
     - Puts the system to sleep.
 - "Log Out.app"
     - Logs out of the current user account.
+
+![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-login-shortcuts/master/images/login%20window.png)
 
 ## Usage
 
