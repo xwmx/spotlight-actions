@@ -2,7 +2,7 @@
 
 Use Spotlight on macOS for fast user switching, opening the login window, putting the system to sleep, and other account operations.
 
-`spotlight-login-shortcuts` is a little shell script that generates an application bundle for each username on the system. When one these applications is launched with Spotlight, the login window for that account is opened, just as if the account is selected in the menu bar dropdown.
+`spotlight-login-shortcuts` is a little shell script that generates an application bundle for each username on the system. When one of these applications is launched with Spotlight (or any other way), the login window for that account is opened, just as if the account is selected in the menu bar dropdown.
 
 ![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-login-shortcuts/master/images/username.png)
 
