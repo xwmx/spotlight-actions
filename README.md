@@ -1,6 +1,6 @@
 # spotlight-login-shortcuts
 
-Use Spotlight on macOS for fast user switching, opening the login window, and
+Use Spotlight on macOS for fast user switching, opening the login window, putting the system to sleep, and
 other account operations.
 
 `spotlight-login-shortcuts` generates an application for each username.
