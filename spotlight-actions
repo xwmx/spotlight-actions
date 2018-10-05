@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 ###############################################################################
-# spotlight-login-shortcuts
+# spotlight-actions
 #
-# Use Spotlight on macOS for fast user switching, opening the login window, and
-# other account operations.
+# Use Spotlight on macOS to trigger actions, such as opening the login window,
+# putting the system to sleep, or logging in as another user.
 #
-# https://github.com/alphabetum/spotlight-login-shortcuts
+# https://github.com/alphabetum/spotlight-actions
 #
 # Copyright (c) 2018 William Melody • hi@williammelody.com
 ###############################################################################
@@ -24,7 +24,7 @@ IFS=$'\n\t'
 ###############################################################################
 
 export _TARGET_DIRECTORY
-_TARGET_DIRECTORY="/Applications/Spotlight Shortcuts"
+_TARGET_DIRECTORY="/Applications/Spotlight Actions"
 
 ###############################################################################
 # Utilities

@@ -1,13 +1,10 @@
-# spotlight-login-shortcuts
+# spotlight-actions
 
-Use Spotlight on macOS for fast user switching, opening the login window, putting the system to sleep, and other account operations.
+Use Spotlight on macOS for fast user switching, opening the login window, putting the system to sleep, and other actions.
 
-`spotlight-login-shortcuts` is a little shell script that generates an application bundle for each username on the system. When one of these applications is launched with Spotlight (or any other way), the login window for that account is opened, just as if the account is selected in the menu bar dropdown.
+`spotlight-actions` generates small application bundles that perform discrete actions.
 
-![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-login-shortcuts/master/screenshots/username.png)
-
-Additional application bundles are created for other account operations
-including:
+## Actions
 
 - "Login Window.app"
     - Opens the Login Window.
@@ -16,10 +13,16 @@ including:
 - "Log Out.app"
     - Logs out of the current user account.
 
-![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-login-shortcuts/master/screenshots/login%20window.png)
+![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/screenshots/login%20window.png)
 
-All applications are installed in `/Applications/Spotlight Shortcuts`.
+## Account Login Actions
+
+`spotlight-actions` generates an action for each user account on the system, named after each username, which open the login window for that account, just like using the fast user switching menu.
+
+![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/screenshots/username.png)
+
+All applications are installed in `/Applications/Spotlight Actions`.
 
 ## Usage
 
-Simply download and run `spotlight-login-shortcuts` from the terminal to generate the application bundles in `/Applications/Spotlight Shortcuts`
+Simply download and run `spotlight-actions` from the terminal to generate the action application bundles in `/Applications/Spotlight Actions`
