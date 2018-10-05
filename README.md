@@ -6,12 +6,12 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 ## Actions
 
+- "Log Out.app"
+    - Logs out of the current user account.
 - "Login Window.app"
     - Opens the Login Window.
 - "Sleep.app"
     - Puts the system to sleep.
-- "Log Out.app"
-    - Logs out of the current user account.
 
 ![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/screenshots/login%20window.png)
 
@@ -21,7 +21,7 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 ![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/screenshots/username.png)
 
-All applications are installed in `/Applications/Spotlight Actions`.
+Actions are installed in `/Applications/Spotlight Actions`.
 
 ## Usage
 
