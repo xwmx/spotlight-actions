@@ -28,6 +28,6 @@ _build_action_usernames() {
       continue
     fi
 
-    _build_action "user" "${_username}"
+    _build_action "User" "${_username}"
   done
 } && _build_action_usernames

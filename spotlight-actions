@@ -435,9 +435,9 @@ _install() {
     printf "'%s' not found.\\n" "${_action_path}" 1>&2
   fi
 
-  if [[ -e "${_action_path}/build.sh" ]]
+  if [[ -e "${_action_path}/install.sh" ]]
   then
-    source "${_action_path}/build.sh"
+    source "${_action_path}/install.sh"
   else
     _build_action "${_action_name}"
   fi
@@ -490,12 +490,17 @@ _uninstall() {
     printf "'%s' not found.\\n" "${_action_path}" 1>&2
   fi
 
-  if [[ ! -d "${_TARGET_DIRECTORY}/${_action_name}.app" ]]
+  if [[ -e "${_action_path}/uninstall.sh" ]]
   then
-    printf "'%s' not installed.\\n" "${_action_path}" 1>&2
-  fi
+    source "${_action_path}/uninstall.sh"
+  else
+    if [[ ! -d "${_TARGET_DIRECTORY}/${_action_name}.app" ]]
+    then
+      printf "'%s' not installed.\\n" "${_action_path}" 1>&2
+    fi
 
-  _remove "${_TARGET_DIRECTORY}/${_action_name}.app"
+    _remove "${_TARGET_DIRECTORY}/${_action_name}.app"
+  fi
 }
 
 # ------------------------------------------------------------------ _version()
