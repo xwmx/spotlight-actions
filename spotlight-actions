@@ -169,40 +169,6 @@ _TARGET_DIRECTORY="/Applications/Spotlight Actions"
 # Templates
 ###############################################################################
 
-# _ACCOUNT_SCRIPT_TEMPLATE
-#
-# Script template for creating an app that logs in as the user with the same
-# name as the app..
-export _ACCOUNT_SCRIPT_TEMPLATE
-read -r -d '' _ACCOUNT_SCRIPT_TEMPLATE <<HEREDOC || true
-#!/usr/bin/env bash
-_switch_to_the_user_with_the_same_name_as_this_app_bundle() {
-  # Get username from the application bundle name.
-  local _username="\$(
-    ps -o comm= \$PPID \
-    | grep -oh '[^/]\+.app' \
-    | sed -e 's/.app//' \
-    | sed -e 's/MacOS//'
-  )"
-  local _user_id=\$(id -u "\${_username}")
-  local _dialog_message
-
-  if [[ -z "\${_user_id:-}" ]]
-  then
-    read -r -d '' "_dialog_message" <<DIALOG_MESSAGE_HEREDOC
-No user named '\${_username}' found. To recreate Actions run:
-  spotlight-actions
-DIALOG_MESSAGE_HEREDOC
-    osascript -e "display dialog \"\${_dialog_message}\""
-  elif [[ "\$(whoami)" == "\${_username}" ]]
-  then
-    osascript -e "display dialog \"Already logged in to '\${_username}'.\""
-  else
-    "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession" -switchToUserID "\${_user_id}"
-  fi
-} && _switch_to_the_user_with_the_same_name_as_this_app_bundle
-HEREDOC
-
 # _APPLESCRIPT_APP_TEMPLATE
 #
 # Generic wrapper template for running a shell script in an app bundle.
@@ -210,19 +176,7 @@ export _APPLESCRIPT_APP_TEMPLATE
 read -r -d '' _APPLESCRIPT_APP_TEMPLATE <<HEREDOC || true
 #!/usr/bin/osascript
 set current_path to (path to me)
-do shell script "."  & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/shellscript"
-HEREDOC
-
-# _ACCOUNT_SCRIPT_TEMPLATE
-#
-# Script template for creating an app that logs in as the user with the same
-# name as the app..
-export _LOGIN_WINDOW_SCRIPT_TEMPLATE
-read -r -d '' _LOGIN_WINDOW_SCRIPT_TEMPLATE <<HEREDOC || true
-#!/usr/bin/env bash
-_go_to_login_window() {
-  "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession" -suspend
-} && _go_to_login_window
+do shell script "." & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/script.sh"
 HEREDOC
 
 ###############################################################################
