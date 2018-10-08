@@ -230,7 +230,7 @@ _PRINT_VERSION=0
 _USE_DEBUG=0
 
 # Initialize additional expected option variables.
-_SUBCOMMAND="list"
+_SUBCOMMAND="help"
 _ARGUMENTS=("${0}")
 
 # getopts and getopts have inconsistent behavior, so using a simple home-brewed
