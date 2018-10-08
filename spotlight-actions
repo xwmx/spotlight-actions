@@ -23,6 +23,17 @@ IFS=$'\n\t'
 # Utilities
 ###############################################################################
 
+# _command_exists()
+#
+# Usage:
+#   _command_exists <command-name>
+#
+# Returns:
+#   0  If a command with the given name is defined in the current environment.
+#   1  If not.
+#
+# Information on why `hash` is used here:
+# http://stackoverflow.com/a/677212
 _command_exists() {
   hash "${1}" 2>/dev/null
 }
@@ -47,6 +58,10 @@ _debug() {
   fi
 }
 
+# _log_success()
+#
+# Usage:
+#   _log_success <message>
 _log_success() {
   if [[ -n "${1:-}" ]]
   then
@@ -54,7 +69,6 @@ _log_success() {
   fi
 }
 
-###############################################################################
 # _readlink()
 #
 # Usage:
@@ -142,6 +156,12 @@ _readlink() {
   fi
 }
 
+# _remove()
+#
+# Usage:
+#   _remove <path>
+#
+# Use trash for deletion when available.
 _remove() {
   local _command="rm -r"
   if _command_exists "trash"
