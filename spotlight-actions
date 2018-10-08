@@ -233,17 +233,24 @@ HEREDOC
 # _create_action()
 #
 # Usage:
-#   _create_action <name>
+#   _create_action <name> [<app name>]
 _create_action() {
-  local _name="${1:-}"
+  local _action_name="${1:-}"
 
-  if [[ -z "${_name}" ]]
+  if [[ -z "${_action_name}" ]]
   then
     printf "No action name specified.\\n" 1>&2
     return 1
   fi
 
-  local _action_path="${_ACTIONS_DIRECTORY}/${_name}"
+  local _app_name="${2:-}"
+
+  if [[ -z "${_app_name}" ]]
+  then
+    _app_name="${_action_name}"
+  fi
+
+  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}"
 
   if [[ ! -d "${_action_path}" ]]
   then
@@ -251,7 +258,7 @@ _create_action() {
   fi
 
   local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-action.${_name}.XXXXXX")" || exit 1
+  _temp_file_path="$(mktemp "/tmp/spotlight-action.${_action_name}.XXXXXX")" || exit 1
 
   if [[ -e "${_action_path}/main.scpt" ]]
   then
@@ -260,7 +267,7 @@ _create_action() {
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
   then
-    local _target_app_path="${_TARGET_DIRECTORY}/${_name}.app"
+    local _target_app_path="${_TARGET_DIRECTORY}/${_app_name}.app"
     _remove "${_target_app_path}"
 
     osacompile -o "${_target_app_path}" "${_temp_file_path}"
@@ -322,62 +329,18 @@ HEREDOC
 } && _create_target_directory
 
 ###############################################################################
-# _create_actions_for_accounts
+# _create_actions_for_users
 #
 # Create an app for each account that brings up the login window for that
 # account.
-_debug "Starting \`_create_action_for_accounts()\`\\n"
-_create_actions_for_accounts() {
-  local _users_and_ids
-  _users_and_ids=($(dscl . list /Users uid | grep -v '^_'))
-
-  for __user in ${_users_and_ids[@]}
-  do
-    local _username
-    _username="$(echo "${__user}" | awk '{print $1}')"
-
-    # Only print users with valid home directories, which is used here as an
-    # indication that the account is a valid login account. So far I've been
-    # unable to find a better way to list only full login user accounts.
-    local _home_directory
-    _home_directory="$(
-      dscl . -read "/Users/${_username}" NFSHomeDirectory | \
-        awk '{for (i=2; i<NF; i++) printf $i " "; print $NF}'
-    )"
-
-    # Skip system users
-    if [[ "${_username}" == "root" ]]         ||
-       [[ "${_username}" == "daemon" ]]       ||
-       [[ "${_home_directory}" =~ ^/var.* ]]  ||
-       [[ "${_home_directory}" =~ ^/dev.* ]]  ||
-       [[ "${_home_directory}" =~ ^/opt.* ]]
-    then
-      continue
-    fi
-
-    local _temp_file_path
-    _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
-    printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
-
-    if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
-    then
-      local _target_app_path="${_TARGET_DIRECTORY}/${_username}.app"
-      _remove "${_target_app_path}"
-
-      osacompile -o "${_target_app_path}" "${_temp_file_path}"
-      local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/shellscript"
-      printf "%s\\n" "${_ACCOUNT_SCRIPT_TEMPLATE}" > "${_target_app_script_path}"
-      chmod +x "${_target_app_script_path}"
-
-      cp \
-        "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/UserIcon.icns" \
-        "${_target_app_path}/Contents/Resources/applet.icns"
-      _log_success "\"${_target_app_path}\""
-    fi
-
-    rm "${_temp_file_path}"
-  done
-} # && _create_actions_for_accounts
+_create_actions_for_users() {
+  if [[ -e "${_ACTIONS_DIRECTORY}/User/build.sh" ]]
+  then
+    source "${_ACTIONS_DIRECTORY}/User/build.sh"
+  else
+    _create_action "User"
+  fi
+} && _create_actions_for_users
 
 ###############################################################################
 # _create_login_window_action()
