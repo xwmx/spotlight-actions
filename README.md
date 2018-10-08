@@ -13,13 +13,13 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 - "Sleep"
     - Puts the system to sleep.
 
-![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/screenshots/login%20window.png)
+![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/login%20window.png)
 
 ## Account Login Actions
 
 `spotlight-actions` generates an action for each user account on the system, named after each username, which opens the login window for that account, just like the fast user switching menu.
 
-![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/screenshots/username.png)
+![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/username.png)
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
 
