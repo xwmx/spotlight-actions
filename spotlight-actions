@@ -99,8 +99,8 @@ _switch_to_the_user_with_the_same_name_as_this_app_bundle() {
   if [[ -z "\${_user_id:-}" ]]
   then
     read -r -d '' "_dialog_message" <<DIALOG_MESSAGE_HEREDOC
-No user named '\${_username}' found. To recreate shortcuts run:
-  spotlight-login-shortcuts
+No user named '\${_username}' found. To recreate Actions run:
+  spotlight-actions
 DIALOG_MESSAGE_HEREDOC
     osascript -e "display dialog \"\${_dialog_message}\""
   elif [[ "\$(whoami)" == "\${_username}" ]]
@@ -186,12 +186,12 @@ HEREDOC
 } && _create_target_directory
 
 ###############################################################################
-# _create_shortcuts_for_accounts
+# _create_actions_for_accounts
 #
 # Create an app for each account that brings up the login window for that
 # account.
-_debug "Starting \`_create_shortcuts_for_accounts()\`\\n"
-_create_shortcuts_for_accounts() {
+_debug "Starting \`_create_action_for_accounts()\`\\n"
+_create_actions_for_accounts() {
   local _users_and_ids
   _users_and_ids=($(dscl . list /Users uid | grep -v '^_'))
 
@@ -220,7 +220,7 @@ _create_shortcuts_for_accounts() {
     fi
 
     local _temp_file_path
-    _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+    _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
     printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
 
     if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
@@ -241,15 +241,15 @@ _create_shortcuts_for_accounts() {
 
     rm "${_temp_file_path}"
   done
-} && _create_shortcuts_for_accounts
+} && _create_actions_for_accounts
 
 ###############################################################################
-# _create_login_window_shortcut()
+# _create_login_window_action()
 #
 # Create an application that opens the login window.
-_create_login_window_shortcut() {
+_create_login_window_action() {
   local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
   printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
@@ -269,15 +269,15 @@ _create_login_window_shortcut() {
   fi
 
   rm "${_temp_file_path}"
-} && _create_login_window_shortcut
+} && _create_login_window_action
 
 ###############################################################################
-# _create_sleep_shortcut()
+# _create_sleep_action()
 #
 # Create an application that sends the system to sleep.
-_create_sleep_shortcut() {
+_create_sleep_action() {
   local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
   printf "%s\\n" "${_APPLESCRIPT_SLEEP_APP_TEMPLATE}" > "${_temp_file_path}"
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
@@ -290,16 +290,16 @@ _create_sleep_shortcut() {
   fi
 
   rm "${_temp_file_path}"
-} && _create_sleep_shortcut
+} && _create_sleep_action
 
 
 ###############################################################################
-# _create_log_out_shortcut()
+# _create_log_out_action()
 #
 # Create an application that logs out the current user.
-_create_log_out_shortcut() {
+_create_log_out_action() {
   local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-login-shortcut.XXXXXX")" || exit 1
+  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
   printf "tell app \"System Events\" to log out" > "${_temp_file_path}"
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
@@ -312,4 +312,4 @@ _create_log_out_shortcut() {
   fi
 
   rm "${_temp_file_path}"
-} && _create_log_out_shortcut
+} && _create_log_out_action
