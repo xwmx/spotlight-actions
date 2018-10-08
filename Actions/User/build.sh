@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-_build_username_actions() {
+_build_action_usernames() {
   local _users_and_ids
   _users_and_ids=($(dscl . list /Users uid | grep -v '^_'))
 
@@ -30,4 +30,4 @@ _build_username_actions() {
 
     _build_action "user" "${_username}"
   done
-} && _build_username_actions
+} && _build_action_usernames
