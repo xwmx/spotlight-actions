@@ -8,12 +8,12 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 - "Color Picker"
     - Open the macOS color chooser.
-- "Log Out"
-    - Logs out of the current user account.
 - "Login Window"
-    - Opens the Login Window, locking the screen.
+    - Open the Login Window, locking the screen.
+- "Log Out"
+    - Log out of the current user account.
 - "Sleep"
-    - Puts the system to sleep.
+    - Put the system to sleep.
 
 ![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/login%20window.png)
 
