@@ -452,16 +452,27 @@ _install() {
 # Description:
 #   List available actions.
 _list() {
-  local _basename
-
   if [[ -d "${_ACTIONS_DIRECTORY}" ]]
   then
     for __action in "${_ACTIONS_DIRECTORY}"/*
     do
+      local _basename
       _basename="$(
         basename "${__action}" | sed 's|\.[^\.]*$||g'
       )"
-      printf "\"%s\"\\n" "${_basename}"
+
+      local _installed=0
+      if [[ -e "${_TARGET_DIRECTORY}/${_basename}.app" ]]
+      then
+        _installed=1
+      fi
+
+      if ((_installed))
+      then
+        printf "\"%s\" (installed)\\n" "${_basename}"
+      else
+        printf "\"%s\"\\n" "${_basename}"
+      fi
     done
   fi
 }
