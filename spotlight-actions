@@ -199,24 +199,15 @@ _MY_DIRECTORY=$(dirname "$(_readlink -f "$0")")
 # The location of the .spotlight-action definitions.
 _ACTIONS_DIRECTORY="${_MY_DIRECTORY}/Actions"
 
+# $_DEFAULTS_DIRECTORY
+#
+# The location of the .spotlight-action definition defaults.
+_DEFAULTS_DIRECTORY="${_MY_DIRECTORY}/Defaults"
+
 # $_TARGET_DIRECTORY
 #
 # The location to install the build spotlight action application bundles.
 _TARGET_DIRECTORY="/Applications/Spotlight Actions"
-
-###############################################################################
-# Templates
-###############################################################################
-
-# _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE
-#
-# Generic wrapper template for running a shell script in an app bundle.
-export _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE
-read -r -d '' _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE <<HEREDOC || true
-#!/usr/bin/osascript
-set current_path to (path to me)
-do shell script "." & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/script.sh"
-HEREDOC
 
 ###############################################################################
 # Options
@@ -282,7 +273,6 @@ _debug printf "\${_ARGUMENTS[*]:-}: %s\\n" "${_ARGUMENTS[*]:-}"
 #   _build_action <name> [<app name>]
 _build_action() {
   local _action_name="${1:-}"
-
   if [[ -z "${_action_name}" ]]
   then
     printf "No action name specified.\\n" 1>&2
@@ -290,52 +280,54 @@ _build_action() {
   fi
 
   local _app_name="${2:-}"
-
   if [[ -z "${_app_name}" ]]
   then
     _app_name="${_action_name}"
   fi
 
-  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}"
-
+  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}.spotlight-action"
   if [[ ! -d "${_action_path}" ]]
   then
     printf "'%s' not found.\\n" "${_action_path}" 1>&2
   fi
 
   local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-action.${_action_name}.XXXXXX")" || exit 1
-
-  if [[ -e "${_action_path}/main.scpt" ]]
-  then
-    cat "${_action_path}/main.scpt" > "${_temp_file_path}"
-  elif [[ -e "${_action_path}/script.sh" ]]
-  then
-    cat "${_APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
-  else
-    printf "No shell script or AppleScript specified.\\n" 1>&2
-    exit 1
-  fi
+  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
   then
+    # Cleanup #################################################################
     local _target_app_path="${_TARGET_DIRECTORY}/${_app_name}.app"
     _remove "${_target_app_path}"
 
-    osacompile -o "${_target_app_path}" "${_temp_file_path}"
-
-    if [[ -e "${_action_path}/script.sh" ]]
+    # main.scpt ###############################################################
+    if [[ -e "${_action_path}/main.scpt" ]]
     then
-      local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/script.sh"
-      cat "${_action_path}/script.sh" > "${_target_app_script_path}"
-      chmod +x "${_target_app_script_path}"
+      cat "${_action_path}/main.scpt" > "${_temp_file_path}"
+    else
+      cat "${_DEFAULTS_DIRECTORY}/main.scpt" > "${_temp_file_path}"
     fi
 
+    # Compile #################################################################
+    osacompile -o "${_target_app_path}" "${_temp_file_path}"
+
+    # script.sh ###############################################################
+    local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/script.sh"
+    if [[ -e "${_action_path}/script.sh" ]]
+    then
+      cat "${_action_path}/script.sh" > "${_target_app_script_path}"
+    else
+      cat "${_DEFAULTS_DIRECTORY}/script.sh" > "${_target_app_script_path}"
+    fi
+    chmod +x "${_target_app_script_path}"
+
+    # icon.icns ###############################################################
+    local _target_icon_path="${_target_app_path}/Contents/Resources/applet.icns"
     if [[ -e "${_action_path}/icon.icns" ]]
     then
-      cp \
-        "${_action_path}/icon.icns" \
-        "${_target_app_path}/Contents/Resources/applet.icns"
+      cp "${_action_path}/icon.icns" "${_target_icon_path}"
+    else
+      cp "${_DEFAULTS_DIRECTORY}/icon.icns" "${_target_icon_path}"
     fi
 
     _log_success "\"${_target_app_path}\""
@@ -437,7 +429,7 @@ _install() {
     return 1
   fi
 
-  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}"
+  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}.spotlight-action"
 
   if [[ ! -d "${_action_path}" ]]
   then
@@ -503,11 +495,12 @@ _uninstall() {
     return 1
   fi
 
-  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}"
+  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}.spotlight-action"
 
   if [[ ! -d "${_action_path}" ]]
   then
     printf "'%s' not found.\\n" "${_action_path}" 1>&2
+    exit 1
   fi
 
   if [[ -e "${_action_path}/uninstall.sh" ]]
@@ -517,9 +510,11 @@ _uninstall() {
     if [[ ! -d "${_TARGET_DIRECTORY}/${_action_name}.app" ]]
     then
       printf "'%s' not installed.\\n" "${_action_path}" 1>&2
+      exit 1
+    else
+      _remove "${_TARGET_DIRECTORY}/${_action_name}.app"
+      printf "'%s' uninstalled.\\n" "${_action_name}"
     fi
-
-    _remove "${_TARGET_DIRECTORY}/${_action_name}.app"
   fi
 }
 
