@@ -179,6 +179,16 @@ _remove() {
 # Environment
 ###############################################################################
 
+# $_VERSION
+#
+# The current program version.
+_VERSION="0.0.1"
+
+# $_ME
+#
+# Set to the program's basename.
+_ME=$(basename "${0}")
+
 export _ACTIONS_DIRECTORY
 _ACTIONS_DIRECTORY="$(dirname "$(_readlink -f "$0")")/Actions"
 
@@ -198,6 +208,59 @@ read -r -d '' _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE <<HEREDOC || true
 set current_path to (path to me)
 do shell script "." & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/script.sh"
 HEREDOC
+
+###############################################################################
+# Options
+###############################################################################
+
+# Parse Options ###############################################################
+
+# Initialize program option variables.
+_PRINT_HELP=0
+_PRINT_VERSION=0
+_USE_DEBUG=0
+
+# Initialize additional expected option variables.
+_SUBCOMMAND="list"
+_ARGUMENTS=("${0}")
+
+# getopts and getopts have inconsistent behavior, so using a simple home-brewed
+# while loop. This isn't perfectly compliant with POSIX, but it's close enough
+# and this appears to be a widely used approach.
+#
+# More info:
+#   http://www.gnu.org/software/libc/manual/html_node/Argument-Syntax.html
+#   http://stackoverflow.com/a/14203146
+#   http://stackoverflow.com/a/7948533
+while [[ ${#} -gt 0 ]]
+do
+  opt="${1}"
+  shift
+  case "${opt}" in
+    -h|--help|help)
+      _PRINT_HELP=1
+      ;;
+    --debug)
+      _USE_DEBUG=1
+      ;;
+    --version)
+      _PRINT_VERSION=1
+      ;;
+    install|list|uninstall)
+      _SUBCOMMAND="${opt}"
+      ;;
+    --endopts)
+      # Terminate option parsing.
+      break
+      ;;
+    *)
+      _ARGUMENTS+=("${opt}")
+      ;;
+  esac
+done
+
+_debug printf "\${_SUBCOMMAND}: %s\\n" "${_SUBCOMMAND}"
+_debug printf "\${_ARGUMENTS[*]:-}: %s\\n" "${_ARGUMENTS[*]:-}"
 
 ###############################################################################
 # Primary Functions
@@ -273,6 +336,9 @@ _build_action() {
 }
 
 ###############################################################################
+# Setup
+###############################################################################
+
 # _create_target_directory()
 #
 # Create the target directory that will contain the appllication bundles.
@@ -300,11 +366,11 @@ HEREDOC
     done
 
     mkdir -p "${_TARGET_DIRECTORY}"
-  fi
 
-  if [[ -d "${_TARGET_DIRECTORY}" ]]
-  then
-    _log_success "\"${_TARGET_DIRECTORY}\""
+    if [[ -d "${_TARGET_DIRECTORY}" ]]
+    then
+      _log_success "\"${_TARGET_DIRECTORY}\""
+    fi
   fi
 } && _create_target_directory
 
@@ -320,7 +386,7 @@ _build_action_user() {
   else
     _build_action "User"
   fi
-} && _build_action_user
+} # && _build_action_user
 
 ###############################################################################
 # _build_action_login_window()
@@ -328,7 +394,7 @@ _build_action_user() {
 # Create an application that opens the login window.
 _build_action_login_window() {
   _build_action "Login Window"
-} && _build_action_login_window
+} # && _build_action_login_window
 
 ###############################################################################
 # _build_action_sleep()
@@ -336,7 +402,7 @@ _build_action_login_window() {
 # Create an application that sends the system to sleep.
 _build_action_sleep() {
   _build_action "Sleep"
-} && _build_action_sleep
+} # && _build_action_sleep
 
 ###############################################################################
 # _build_action_log_out()
@@ -344,4 +410,154 @@ _build_action_sleep() {
 # Create an application that logs out the current user.
 _build_action_log_out() {
   _build_action "Log Out"
-} && _build_action_log_out
+} # && _build_action_log_out
+
+
+###############################################################################
+# Program Functions
+###############################################################################
+
+# --------------------------------------------------------------------- _help()
+# _help()
+#
+# Usage:
+#   _help
+#
+# Description:
+#   Print the program help information.
+_help() {
+  cat <<HEREDOC
+Spotlight Actions
+
+Manage Spotlight Actions.
+
+Usage:
+  ${_ME} list
+  ${_ME} install
+  ${_ME} uninstall
+  ${_ME} -h | --help | help
+  ${_ME} --version
+
+Subcommands:
+  list       List all available actions.
+  install    Install the specified action.
+  uninstall  Uninstall the specified action.
+  help       Display this help information.
+
+Options:
+  -h --help  Display this help information.
+  --version  Display version information.
+HEREDOC
+}
+
+# ------------------------------------------------------------------ _install()
+# _install()
+#
+# Usage:
+#   _install <action>
+#
+# Description:
+#   Install the action with the specified name..
+_install() {
+  local _action_name="${1:-}"
+
+  if [[ -z "${_action_name}" ]]
+  then
+    printf "No action name specified.\\n" 1>&2
+    return 1
+  fi
+
+  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}"
+
+  if [[ ! -d "${_action_path}" ]]
+  then
+    printf "'%s' not found.\\n" "${_action_path}" 1>&2
+  fi
+
+  _build_action "${_action_name}"
+}
+
+# --------------------------------------------------------------------- _list()
+# _list()
+#
+# Usage:
+#   _list
+#
+# Description:
+#   List available actions.
+_list() {
+  local _basename
+
+  if [[ -d "${_ACTIONS_DIRECTORY}" ]]
+  then
+    for __action in "${_ACTIONS_DIRECTORY}"/*
+    do
+      _basename="$(
+        basename "${__action}" | sed 's|\.[^\.]*$||g'
+      )"
+      printf "\"%s\"\\n" "${_basename}"
+    done
+  fi
+}
+
+# ------------------------------------------------------------------ _uninstall()
+# _uninstall()
+#
+# Usage:
+#   _uninstall <action>
+#
+# Description:
+#   Uninstall the action with the specified name..
+_uninstall() {
+  local _action_name="${1:-}"
+
+  if [[ -z "${_action_name}" ]]
+  then
+    printf "No action name specified.\\n" 1>&2
+    return 1
+  fi
+
+  local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}"
+
+  if [[ ! -d "${_action_path}" ]]
+  then
+    printf "'%s' not found.\\n" "${_action_path}" 1>&2
+  fi
+
+  if [[ ! -d "${_TARGET_DIRECTORY}/${_action_name}.app" ]]
+  then
+    printf "'%s' not installed.\\n" "${_action_path}" 1>&2
+  fi
+
+  _remove "${_TARGET_DIRECTORY}/${_action_name}.app"
+}
+
+# ------------------------------------------------------------------ _version()
+# _version()
+#
+# Usage:
+#   _version
+#
+# Description:
+#   Print the value of $_VERSION.
+_version() {
+  printf "%s\\n" "${_VERSION}"
+}
+
+###############################################################################
+# Main
+###############################################################################
+
+_main() {
+  if ((_PRINT_HELP))
+  then
+    _help
+  elif ((_PRINT_VERSION))
+  then
+    _version
+  else
+    "_${_SUBCOMMAND}" "${_ARGUMENTS[@]:1}"
+  fi
+}
+
+_main "${@:-}"
