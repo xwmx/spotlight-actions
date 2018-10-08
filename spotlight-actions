@@ -189,10 +189,15 @@ _VERSION="0.0.1.alpha"
 # Set to the program's basename.
 _ME=$(basename "${0}")
 
+# $_MY_DIRECTORY
+#
+# The location of the current program directory.
+_MY_DIRECTORY=$(dirname "$(_readlink -f "$0")")
+
 # $_ACTIONS_DIRECTORY
 #
 # The location of the .spotlight-action definitions.
-_ACTIONS_DIRECTORY="$(dirname "$(_readlink -f "$0")")/Actions"
+_ACTIONS_DIRECTORY="${_MY_DIRECTORY}/Actions"
 
 # $_TARGET_DIRECTORY
 #
