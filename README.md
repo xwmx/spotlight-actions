@@ -17,7 +17,7 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 ![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/login%20window.png)
 
-## Account Login Actions
+## User Login Actions
 
 `spotlight-actions` generates an action for each user account on the system, named after each username, which opens the login window for that account, just like the fast user switching menu.
 
