@@ -375,45 +375,6 @@ HEREDOC
 } && _create_target_directory
 
 ###############################################################################
-# _build_actions_for_users
-#
-# Create an app for each account that brings up the login window for that
-# account.
-_build_action_user() {
-  if [[ -e "${_ACTIONS_DIRECTORY}/User/build.sh" ]]
-  then
-    source "${_ACTIONS_DIRECTORY}/User/build.sh"
-  else
-    _build_action "User"
-  fi
-} # && _build_action_user
-
-###############################################################################
-# _build_action_login_window()
-#
-# Create an application that opens the login window.
-_build_action_login_window() {
-  _build_action "Login Window"
-} # && _build_action_login_window
-
-###############################################################################
-# _build_action_sleep()
-#
-# Create an application that sends the system to sleep.
-_build_action_sleep() {
-  _build_action "Sleep"
-} # && _build_action_sleep
-
-###############################################################################
-# _build_action_log_out()
-#
-# Create an application that logs out the current user.
-_build_action_log_out() {
-  _build_action "Log Out"
-} # && _build_action_log_out
-
-
-###############################################################################
 # Program Functions
 ###############################################################################
 
