@@ -169,11 +169,11 @@ _TARGET_DIRECTORY="/Applications/Spotlight Actions"
 # Templates
 ###############################################################################
 
-# _APPLESCRIPT_APP_TEMPLATE
+# _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE
 #
 # Generic wrapper template for running a shell script in an app bundle.
-export _APPLESCRIPT_APP_TEMPLATE
-read -r -d '' _APPLESCRIPT_APP_TEMPLATE <<HEREDOC || true
+export _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE
+read -r -d '' _APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE <<HEREDOC || true
 #!/usr/bin/osascript
 set current_path to (path to me)
 do shell script "." & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/script.sh"
@@ -217,6 +217,12 @@ _create_action() {
   if [[ -e "${_action_path}/main.scpt" ]]
   then
     cat "${_action_path}/main.scpt" > "${_temp_file_path}"
+  elif [[ -e "${_action_path}/script.sh" ]]
+  then
+    cat "${_APPLESCRIPT_SHELL_SCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
+  else
+    printf "No shell script or AppleScript specified.\\n" 1>&2
+    exit 1
   fi
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
