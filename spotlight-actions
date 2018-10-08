@@ -20,13 +20,6 @@ set -o pipefail
 IFS=$'\n\t'
 
 ###############################################################################
-# Environment
-###############################################################################
-
-export _TARGET_DIRECTORY
-_TARGET_DIRECTORY="/Applications/Spotlight Actions"
-
-###############################################################################
 # Utilities
 ###############################################################################
 
@@ -61,6 +54,94 @@ _log_success() {
   fi
 }
 
+###############################################################################
+# _readlink()
+#
+# Usage:
+#   _readlink [-e|-f|<options>] <path/to/symlink>
+#
+# Options:
+#   -f  All but the last component must exist.
+#   -e  All components must exist.
+#
+# Wrapper for `readlink` that provides portable versions of GNU `readlink -f`
+# and `readlink -e`, which canonicalize by following every symlink in every
+# component of the given name recursively.
+#
+# More Information:
+#   http://stackoverflow.com/a/1116890
+_readlink() {
+  local _target_path
+  local _target_file
+  local _final_directory
+  local _final_path
+  local _option
+
+  for __arg in "${@:-}"
+  do
+    case "${__arg}" in
+      -e|-f)
+        _option="${__arg}"
+        ;;
+      -*)
+        # do nothing
+        # ':' is bash no-op
+        :
+        ;;
+      *)
+        if [[ -z "${_target_path:-}" ]]
+        then
+          _target_path="${__arg}"
+        fi
+        ;;
+    esac
+  done
+
+  if [[ -z "${_option}" ]]
+  then
+    readlink "${@}"
+  else
+    if [[ -z "${_target_path:-}" ]]
+    then
+      printf "_readlink: missing operand\\n"
+      return 1
+    fi
+
+    cd "$(dirname "${_target_path}")" || return 1
+    _target_file="$(basename "${_target_path}")"
+
+    # Iterate down a (possible) chain of symlinks
+    while [[ -L "${_target_file}" ]]
+    do
+      _target_file="$(readlink "${_target_file}")"
+      cd "$(dirname "${_target_file}")" || return 1
+      _target_file="$(basename "${_target_file}")"
+    done
+
+    # Compute the canonicalized name by finding the physical path
+    # for the directory we're in and appending the target file.
+    _final_directory="$(pwd -P)"
+    _final_path="${_final_directory}/${_target_file}"
+
+    if [[ "${_option}" == "-f" ]]
+    then
+      printf "%s\\n" "${_final_path}"
+      return 0
+    elif [[ "${_option}" == "-e" ]]
+    then
+      if [[ -e "${_final_path}" ]]
+      then
+        printf "%s\\n" "${_final_path}"
+        return 0
+      else
+        return 1
+      fi
+    else
+      return 1
+    fi
+  fi
+}
+
 _trash_or_rm() {
   local _command="rm -r"
   if _command_exists "trash"
@@ -73,6 +154,16 @@ _trash_or_rm() {
     "${_command}" "${1}"
   fi
 }
+
+###############################################################################
+# Environment
+###############################################################################
+
+export _ACTIONS_DIRECTORY
+_ACTIONS_DIRECTORY="$(dirname "$(_readlink -f "$0")")/Actions"
+
+export _TARGET_DIRECTORY
+_TARGET_DIRECTORY="/Applications/Spotlight Actions"
 
 ###############################################################################
 # Templates
@@ -148,6 +239,37 @@ HEREDOC
 ###############################################################################
 # Primary Functions
 ###############################################################################
+
+###############################################################################
+# _create_action()
+#
+# Usage:
+#   _create_action <name>
+_create_action() {
+  local _name="${1:-}"
+
+  if [[ -z "${_name}" ]]
+  then
+    printf "Name not found.\\n" 1>&2
+    return 1
+  fi
+
+  local _temp_file_path
+  _temp_file_path="$(mktemp "/tmp/spotlight-action.${_name}.XXXXXX")" || exit 1
+
+  cat "${_ACTIONS_DIRECTORY}/${_name}/main.scpt" > "${_temp_file_path}"
+
+  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
+  then
+    local _target_app_path="${_TARGET_DIRECTORY}/${_name}.app"
+    _trash_or_rm "${_target_app_path}"
+
+    osacompile -o "${_target_app_path}" "${_temp_file_path}"
+    _log_success "\"${_target_app_path}\""
+  fi
+
+  _trash_or_rm "${_temp_file_path}"
+}
 
 ###############################################################################
 # _create_target_directory()
@@ -241,7 +363,7 @@ _create_actions_for_accounts() {
 
     rm "${_temp_file_path}"
   done
-} && _create_actions_for_accounts
+} # && _create_actions_for_accounts
 
 ###############################################################################
 # _create_login_window_action()
@@ -269,7 +391,7 @@ _create_login_window_action() {
   fi
 
   rm "${_temp_file_path}"
-} && _create_login_window_action
+} # && _create_login_window_action
 
 ###############################################################################
 # _create_sleep_action()
@@ -290,26 +412,12 @@ _create_sleep_action() {
   fi
 
   rm "${_temp_file_path}"
-} && _create_sleep_action
-
+} # && _create_sleep_action
 
 ###############################################################################
 # _create_log_out_action()
 #
 # Create an application that logs out the current user.
 _create_log_out_action() {
-  local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
-  printf "tell app \"System Events\" to log out" > "${_temp_file_path}"
-
-  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
-  then
-    local _target_app_path="${_TARGET_DIRECTORY}/Log Out.app"
-    _trash_or_rm "${_target_app_path}"
-
-    osacompile -o "${_target_app_path}" "${_temp_file_path}"
-    _log_success "\"${_target_app_path}\""
-  fi
-
-  rm "${_temp_file_path}"
+  _create_action "Log Out"
 } && _create_log_out_action
