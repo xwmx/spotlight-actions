@@ -239,14 +239,24 @@ _create_action() {
 
   if [[ -z "${_name}" ]]
   then
-    printf "Name not found.\\n" 1>&2
+    printf "No action name specified.\\n" 1>&2
     return 1
+  fi
+
+  local _action_path="${_ACTIONS_DIRECTORY}/${_name}"
+
+  if [[ ! -d "${_action_path}" ]]
+  then
+    printf "'%s' not found.\\n" "${_action_path}" 1>&2
   fi
 
   local _temp_file_path
   _temp_file_path="$(mktemp "/tmp/spotlight-action.${_name}.XXXXXX")" || exit 1
 
-  cat "${_ACTIONS_DIRECTORY}/${_name}/main.scpt" > "${_temp_file_path}"
+  if [[ -e "${_action_path}/main.scpt" ]]
+  then
+    cat "${_action_path}/main.scpt" > "${_temp_file_path}"
+  fi
 
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
   then
@@ -255,10 +265,16 @@ _create_action() {
 
     osacompile -o "${_target_app_path}" "${_temp_file_path}"
 
-    if [[ -e "${_ACTIONS_DIRECTORY}/${_name}/icon.icns" ]]
+    if [[ -e "${_action_path}/script.sh" ]]
+    then
+      local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/script"
+      cat "${_action_path}/script.sh" > "${_target_app_script_path}"
+    fi
+
+    if [[ -e "${_action_path}/icon.icns" ]]
     then
       cp \
-        "${_ACTIONS_DIRECTORY}/${_name}/icon.icns" \
+        "${_action_path}/icon.icns" \
         "${_target_app_path}/Contents/Resources/applet.icns"
     fi
 
@@ -367,28 +383,8 @@ _create_actions_for_accounts() {
 #
 # Create an application that opens the login window.
 _create_login_window_action() {
-  local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
-  printf "%s\\n" "${_APPLESCRIPT_APP_TEMPLATE}" > "${_temp_file_path}"
-
-  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
-  then
-    local _target_app_path="${_TARGET_DIRECTORY}/Login Window.app"
-    _remove "${_target_app_path}"
-
-    osacompile -o "${_target_app_path}" "${_temp_file_path}"
-    local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/shellscript"
-    printf "%s\\n" "${_LOGIN_WINDOW_SCRIPT_TEMPLATE}" > "${_target_app_script_path}"
-    chmod +x "${_target_app_script_path}"
-
-    cp \
-      "/System/Library/CoreServices/CoreTypes.bundle/Contents/Resources/GroupIcon.icns" \
-      "${_target_app_path}/Contents/Resources/applet.icns"
-    _log_success "\"${_target_app_path}\""
-  fi
-
-  rm "${_temp_file_path}"
-} # && _create_login_window_action
+  _create_action "Login Window"
+} && _create_login_window_action
 
 ###############################################################################
 # _create_sleep_action()
