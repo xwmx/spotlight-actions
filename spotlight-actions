@@ -182,7 +182,7 @@ _remove() {
 # $_VERSION
 #
 # The current program version.
-_VERSION="0.0.1"
+_VERSION="0.0.1.alpha"
 
 # $_ME
 #
