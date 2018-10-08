@@ -213,17 +213,6 @@ set current_path to (path to me)
 do shell script "."  & quote & POSIX path of current_path & quote & "Contents/Resources/Scripts/shellscript"
 HEREDOC
 
-# _APPLESCRIPT_SLEEP_APP_TEMPLATE
-#
-# AppleScript template for an app that makes the computer sleep.
-export _APPLESCRIPT_SLEEP_APP_TEMPLATE
-read -r -d '' _APPLESCRIPT_SLEEP_APP_TEMPLATE <<HEREDOC || true
-#!/usr/bin/osascript
-tell application "Finder"
-sleep
-end tell
-HEREDOC
-
 # _ACCOUNT_SCRIPT_TEMPLATE
 #
 # Script template for creating an app that logs in as the user with the same
@@ -398,21 +387,8 @@ _create_login_window_action() {
 #
 # Create an application that sends the system to sleep.
 _create_sleep_action() {
-  local _temp_file_path
-  _temp_file_path="$(mktemp "/tmp/spotlight-action.XXXXXX")" || exit 1
-  printf "%s\\n" "${_APPLESCRIPT_SLEEP_APP_TEMPLATE}" > "${_temp_file_path}"
-
-  if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
-  then
-    local _target_app_path="${_TARGET_DIRECTORY}/Sleep.app"
-    _remove "${_target_app_path}"
-
-    osacompile -o "${_target_app_path}" "${_temp_file_path}"
-    _log_success "\"${_target_app_path}\""
-  fi
-
-  rm "${_temp_file_path}"
-} # && _create_sleep_action
+  _create_action "Sleep"
+} && _create_sleep_action
 
 ###############################################################################
 # _create_log_out_action()
