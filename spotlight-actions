@@ -254,6 +254,14 @@ _create_action() {
     _remove "${_target_app_path}"
 
     osacompile -o "${_target_app_path}" "${_temp_file_path}"
+
+    if [[ -e "${_ACTIONS_DIRECTORY}/${_name}/icon.icns" ]]
+    then
+      cp \
+        "${_ACTIONS_DIRECTORY}/${_name}/icon.icns" \
+        "${_target_app_path}/Contents/Resources/applet.icns"
+    fi
+
     _log_success "\"${_target_app_path}\""
   fi
 
