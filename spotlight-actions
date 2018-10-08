@@ -204,11 +204,11 @@ HEREDOC
 ###############################################################################
 
 ###############################################################################
-# _create_action()
+# _build_action()
 #
 # Usage:
-#   _create_action <name> [<app name>]
-_create_action() {
+#   _build_action <name> [<app name>]
+_build_action() {
   local _action_name="${1:-}"
 
   if [[ -z "${_action_name}" ]]
@@ -309,39 +309,39 @@ HEREDOC
 } && _create_target_directory
 
 ###############################################################################
-# _create_actions_for_users
+# _build_actions_for_users
 #
 # Create an app for each account that brings up the login window for that
 # account.
-_create_actions_for_users() {
+_build_action_user() {
   if [[ -e "${_ACTIONS_DIRECTORY}/User/build.sh" ]]
   then
     source "${_ACTIONS_DIRECTORY}/User/build.sh"
   else
-    _create_action "User"
+    _build_action "User"
   fi
-} && _create_actions_for_users
+} && _build_action_user
 
 ###############################################################################
-# _create_login_window_action()
+# _build_action_login_window()
 #
 # Create an application that opens the login window.
-_create_login_window_action() {
-  _create_action "Login Window"
-} && _create_login_window_action
+_build_action_login_window() {
+  _build_action "Login Window"
+} && _build_action_login_window
 
 ###############################################################################
-# _create_sleep_action()
+# _build_action_sleep()
 #
 # Create an application that sends the system to sleep.
-_create_sleep_action() {
-  _create_action "Sleep"
-} && _create_sleep_action
+_build_action_sleep() {
+  _build_action "Sleep"
+} && _build_action_sleep
 
 ###############################################################################
-# _create_log_out_action()
+# _build_action_log_out()
 #
 # Create an application that logs out the current user.
-_create_log_out_action() {
-  _create_action "Log Out"
-} && _create_log_out_action
+_build_action_log_out() {
+  _build_action "Log Out"
+} && _build_action_log_out
