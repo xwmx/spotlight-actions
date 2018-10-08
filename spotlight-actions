@@ -189,10 +189,14 @@ _VERSION="0.0.1.alpha"
 # Set to the program's basename.
 _ME=$(basename "${0}")
 
-export _ACTIONS_DIRECTORY
+# $_ACTIONS_DIRECTORY
+#
+# The location of the .spotlight-action definitions.
 _ACTIONS_DIRECTORY="$(dirname "$(_readlink -f "$0")")/Actions"
 
-export _TARGET_DIRECTORY
+# $_TARGET_DIRECTORY
+#
+# The location to install the build spotlight action application bundles.
 _TARGET_DIRECTORY="/Applications/Spotlight Actions"
 
 ###############################################################################
