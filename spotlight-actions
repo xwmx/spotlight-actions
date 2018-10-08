@@ -474,7 +474,12 @@ _install() {
     printf "'%s' not found.\\n" "${_action_path}" 1>&2
   fi
 
-  _build_action "${_action_name}"
+  if [[ -e "${_action_path}/build.sh" ]]
+  then
+    source "${_action_path}/build.sh"
+  else
+    _build_action "${_action_name}"
+  fi
 }
 
 # --------------------------------------------------------------------- _list()
