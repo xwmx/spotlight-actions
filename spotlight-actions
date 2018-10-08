@@ -267,7 +267,7 @@ _create_action() {
 
     if [[ -e "${_action_path}/script.sh" ]]
     then
-      local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/script"
+      local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/script.sh"
       cat "${_action_path}/script.sh" > "${_target_app_script_path}"
     fi
 
