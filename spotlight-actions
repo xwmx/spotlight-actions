@@ -142,7 +142,7 @@ _readlink() {
   fi
 }
 
-_trash_or_rm() {
+_remove() {
   local _command="rm -r"
   if _command_exists "trash"
   then
@@ -262,13 +262,13 @@ _create_action() {
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
   then
     local _target_app_path="${_TARGET_DIRECTORY}/${_name}.app"
-    _trash_or_rm "${_target_app_path}"
+    _remove "${_target_app_path}"
 
     osacompile -o "${_target_app_path}" "${_temp_file_path}"
     _log_success "\"${_target_app_path}\""
   fi
 
-  _trash_or_rm "${_temp_file_path}"
+  _remove "${_temp_file_path}"
 }
 
 ###############################################################################
@@ -348,7 +348,7 @@ _create_actions_for_accounts() {
     if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
     then
       local _target_app_path="${_TARGET_DIRECTORY}/${_username}.app"
-      _trash_or_rm "${_target_app_path}"
+      _remove "${_target_app_path}"
 
       osacompile -o "${_target_app_path}" "${_temp_file_path}"
       local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/shellscript"
@@ -377,7 +377,7 @@ _create_login_window_action() {
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
   then
     local _target_app_path="${_TARGET_DIRECTORY}/Login Window.app"
-    _trash_or_rm "${_target_app_path}"
+    _remove "${_target_app_path}"
 
     osacompile -o "${_target_app_path}" "${_temp_file_path}"
     local _target_app_script_path="${_target_app_path}/Contents/Resources/Scripts/shellscript"
@@ -405,7 +405,7 @@ _create_sleep_action() {
   if [[ -n "${_temp_file_path}" ]] && [[ "${_temp_file_path}" =~ ^/tmp ]]
   then
     local _target_app_path="${_TARGET_DIRECTORY}/Sleep.app"
-    _trash_or_rm "${_target_app_path}"
+    _remove "${_target_app_path}"
 
     osacompile -o "${_target_app_path}" "${_temp_file_path}"
     _log_success "\"${_target_app_path}\""
