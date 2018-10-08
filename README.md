@@ -6,6 +6,8 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 ## Available Actions
 
+- "Color Picker"
+    - Open the macOS color chooser.
 - "Log Out"
     - Logs out of the current user account.
 - "Login Window"
