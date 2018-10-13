@@ -4,7 +4,7 @@ _switch_to_user() {
   local _username="$(
     ps -o comm= $PPID \
     | grep -oh '[^/]\+.app' \
-    | sed -e 's/Log in as //' \
+    | sed -e 's/Log in as [^\(]*(\(.*\)).app/\1/' \
     | sed -e 's/.app//' \
     | sed -e 's/MacOS//'
   )"
