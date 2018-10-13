@@ -38,6 +38,7 @@ _uninstall_action_log_in_as() {
       printf "'%s' not installed.\\n" "${_app_name}" 1>&2
     fi
 
-    _remove "${_TARGET_DIRECTORY}/${_app_name}"
+    _remove "${_TARGET_DIRECTORY}/${_app_name}" \
+      && printf "'%s' uninstalled.\\n" "${_app_name}"
   done
 } && _uninstall_action_log_in_as

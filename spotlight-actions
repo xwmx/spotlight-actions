@@ -513,8 +513,8 @@ _uninstall() {
       printf "'%s' not installed.\\n" "${_action_path}" 1>&2
       exit 1
     else
-      _remove "${_TARGET_DIRECTORY}/${_action_name}.app"
-      printf "'%s' uninstalled.\\n" "${_action_name}"
+      _remove "${_TARGET_DIRECTORY}/${_action_name}.app" &&
+        printf "'%s' uninstalled.\\n" "${_action_name}"
     fi
   fi
 }
