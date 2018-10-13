@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-_build_action_usernames() {
+_uninstall_action_log_in_as() {
   local _users_and_ids
   _users_and_ids=($(dscl . list /Users uid | grep -v '^_'))
 
@@ -28,6 +28,11 @@ _build_action_usernames() {
       continue
     fi
 
-    _build_action "User" "${_username}"
+    if [[ ! -d "${_TARGET_DIRECTORY}/Log in as ${_username}.app" ]]
+    then
+      printf "'%s' not installed.\\n" "Log in as ${_username}.app" 1>&2
+    fi
+
+    _remove "${_TARGET_DIRECTORY}/Log in as ${_username}.app"
   done
-} && _build_action_usernames
+} && _uninstall_action_log_in_as

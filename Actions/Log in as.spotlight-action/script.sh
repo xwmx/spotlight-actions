@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
-_switch_to_the_user_with_the_same_name_as_this_app_bundle() {
+_switch_to_user() {
   # Get username from the application bundle name.
   local _username="$(
     ps -o comm= $PPID \
     | grep -oh '[^/]\+.app' \
+    | sed -e 's/Log in as //' \
     | sed -e 's/.app//' \
     | sed -e 's/MacOS//'
   )"
@@ -23,5 +24,5 @@ DIALOG_MESSAGE_HEREDOC
   else
     "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession" -switchToUserID "${_user_id}"
   fi
-} && _switch_to_the_user_with_the_same_name_as_this_app_bundle
+} && _switch_to_user
 

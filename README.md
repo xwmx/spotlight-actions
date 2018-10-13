@@ -4,24 +4,20 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 `spotlight-actions` generates single-action apps that can be launched through Spotlight.
 
+![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/login%20window.png)
+
 ## Available Actions
 
 - "Color Picker"
     - Open the macOS color chooser.
+- "Log in as"
+  - Log in as a different user, just like fast user switching and the user menu.
 - "Login Window"
     - Open the Login Window, locking the screen.
 - "Log Out"
     - Log out of the current user account.
 - "Sleep"
     - Put the system to sleep.
-
-![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/login%20window.png)
-
-## User Login Actions
-
-`spotlight-actions` generates an action for each user account on the system, named after each username, which opens the login window for that account, just like the fast user switching menu.
-
-![Spotlight Username Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/username.png)
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
 
