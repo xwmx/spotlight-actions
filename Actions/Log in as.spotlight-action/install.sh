@@ -1,13 +1,16 @@
 #!/usr/bin/env bash
 
 _build_action_login_as() {
-  local _users_and_ids
-  _users_and_ids=($(dscl . list /Users uid | grep -v '^_'))
+  local _users_and_realnames
+  _users_and_realnames=($(dscl . list /Users RealName | grep -v '^_'))
 
-  for __user in ${_users_and_ids[@]}
+  for __user in ${_users_and_realnames[@]}
   do
     local _username
     _username="$(echo "${__user}" | awk '{print $1}')"
+
+    local _realname
+    _realname="$(echo "${__user}" | awk '{$1=""; print substr($0,2)}')"
 
     # Only print users with valid home directories, which is used here as an
     # indication that the account is a valid login account. So far I've been
@@ -28,6 +31,6 @@ _build_action_login_as() {
       continue
     fi
 
-    _build_action "Log in as" "Log in as ${_username}"
+    _build_action "Log in as" "Log in as ${_realname} (${_username})"
   done
 } && _build_action_login_as
