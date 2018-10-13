@@ -1,6 +1,6 @@
 # Spotlight Actions
 
-Use Spotlight on macOS for fast user switching, opening the login window, putting the system to sleep, and other actions.
+Use Spotlight on macOS for fast user switching, locking the screen, putting the system to sleep, and other actions.
 
 `spotlight-actions` generates single-action apps that can be launched through Spotlight.
 
