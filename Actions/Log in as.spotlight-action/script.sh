@@ -20,7 +20,7 @@ DIALOG_MESSAGE_HEREDOC
     osascript -e "display dialog \"${_dialog_message}\""
   elif [[ "$(whoami)" == "${_username}" ]]
   then
-    osascript -e "display dialog \"Already logged in to '${_username}'.\""
+    osascript -e "display dialog \"Already logged in as '${_username}'.\""
   else
     "/System/Library/CoreServices/Menu Extras/User.menu/Contents/Resources/CGSession" -switchToUserID "${_user_id}"
   fi
