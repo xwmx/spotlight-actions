@@ -4,7 +4,7 @@ Use Spotlight on macOS for fast user switching, opening the login window, puttin
 
 `spotlight-actions` generates single-action apps that can be launched through Spotlight.
 
-![Login Window Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/login%20window.png)
+![Log in as Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/log-in-as-example.png)
 
 ## Available Actions
 
