@@ -11,17 +11,17 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
 - "Clear Clipboard"
   - Clear the clipboard contents.
 - "Color Picker"
-    - Open the macOS color chooser.
+  - Open the macOS color chooser.
 - "Log in as"
   - Log in to user accounts without the fast user switching menu.
 - "Login Window"
-    - Open the Login Window, locking the screen.
+  - Open the Login Window, locking the screen.
 - "Log Out"
-    - Log out of the current user account.
+  - Log out of the current user account.
 - "Sleep"
-    - Put the system to sleep.
+  - Put the system to sleep.
 - "Strip Clipboard Formatting"
-    - Strip formatting from a string on the clipboard.
+  - Strip formatting from a string on the clipboard.
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
 
@@ -59,14 +59,14 @@ Options:
 ### Overview
 
 - Example.spotlight-action
-    - main.scpt
-        - An AppleScript script that serves as the primary executable.
-    - script.sh
-        - An optional shell script.
-    - icon.icns
-        - An optional icon file.
-    - install.sh
-        - An optional shell script for customizing the installation process.
-    - uninstall.sh
-        - An optional shell script for customizing the uninstallation process.
+  - main.scpt
+    - An AppleScript script that serves as the primary executable.
+  - script.sh
+    - An optional shell script.
+  - icon.icns
+    - An optional icon file.
+  - install.sh
+    - An optional shell script for customizing the installation process.
+  - uninstall.sh
+    - An optional shell script for customizing the uninstallation process.
 
