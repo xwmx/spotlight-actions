@@ -24,6 +24,8 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
   - Strip formatting from a string on the clipboard.
 - "Toggle Airport Wifi"
   - Turn Airport on or off.
+- "Toggle Desktop"
+  - Show or hide desktop icons.
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
 
