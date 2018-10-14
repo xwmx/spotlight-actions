@@ -12,10 +12,10 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
   - Clear the clipboard contents.
 - "Color Picker"
   - Open the macOS color chooser.
+- "Lock to Login Window"
+  - Go to the Login Window, locking the screen.
 - "Log in as"
   - Log in to user accounts without the fast user switching menu.
-- "Login Window"
-  - Open the Login Window, locking the screen.
 - "Log Out"
   - Log out of the current user account.
 - "Sleep"
