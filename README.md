@@ -8,6 +8,8 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
 
 ## Available Actions
 
+- "Clear Clipboard"
+  - Clear the clipboard contents.
 - "Color Picker"
     - Open the macOS color chooser.
 - "Log in as"
