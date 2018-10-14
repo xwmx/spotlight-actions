@@ -22,6 +22,8 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
   - Put the system to sleep.
 - "Strip Clipboard Formatting"
   - Strip formatting from a string on the clipboard.
+- "Toggle Airport Wifi"
+  - Turn Airport on or off.
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
 
