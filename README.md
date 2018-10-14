@@ -18,6 +18,8 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
     - Log out of the current user account.
 - "Sleep"
     - Put the system to sleep.
+- "Strip Clipboard Formatting"
+    - Strip formatting from a string on the clipboard.
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
 
