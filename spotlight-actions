@@ -202,7 +202,7 @@ _ACTIONS_DIRECTORY="${_MY_DIRECTORY}/Actions"
 # $_DEFAULTS_DIRECTORY
 #
 # The location of the .spotlight-action definition defaults.
-_DEFAULTS_DIRECTORY="${_MY_DIRECTORY}/Defaults"
+_DEFAULTS_DIRECTORY="${_ACTIONS_DIRECTORY}/Default.spotlight-actions"
 
 # $_TARGET_DIRECTORY
 #
