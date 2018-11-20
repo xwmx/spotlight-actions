@@ -38,6 +38,30 @@ _command_exists() {
   hash "${1}" 2>/dev/null
 }
 
+# _convert_id_to_name()
+#
+# Usage:
+#   _convert_id_to_name <id>
+#
+# Convert a lowercase-hyphenated id to a  Title Case name.
+_convert_id_to_name() {
+  printf "${1:-}" \
+    | tr '-' ' ' \
+    | awk '{for(i=1;i<=NF;i++){ $i=toupper(substr($i,1,1)) substr($i,2) }}1'
+}
+
+# _convert_name_to_id()
+#
+# Usage:
+#   _convert_name_to_id <name>
+#
+# Convert a Title Case name to a lowercase-hyphenated id.
+_convert_name_to_id() {
+  printf "${1:-}" \
+    | tr ' ' '-' \
+    | tr '[:upper:]' '[:lower:]'
+}
+
 # _debug()
 #
 # Usage:
