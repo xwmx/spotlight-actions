@@ -19,7 +19,7 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
 - Lock to Login Window
   - Go to the Login Window, locking the screen.
 - Log in as
-  - Log in to user accounts without the fast user switching menu.
+  - Log in to user accounts / fast user switching.
 - Log Out
   - Log out of the current user account.
 - Sleep
