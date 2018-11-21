@@ -226,7 +226,7 @@ _ACTIONS_DIRECTORY="${_MY_DIRECTORY}/Actions"
 # $_DEFAULTS_DIRECTORY
 #
 # The location of the .spotlight-action definition defaults.
-_DEFAULTS_DIRECTORY="${_ACTIONS_DIRECTORY}/Default.spotlight-actions"
+_DEFAULTS_DIRECTORY="${_ACTIONS_DIRECTORY}/Default.spotlight-action"
 
 # $_TARGET_DIRECTORY
 #
@@ -441,20 +441,32 @@ HEREDOC
 # _install()
 #
 # Usage:
-#   _install <action>
+#   _install <id>
 #
 # Description:
 #   Install the action with the specified name..
 _install() {
-  local _action_name="${1:-}"
+  local _action_id="${1:-}"
 
-  if [[ -z "${_action_name}" ]]
+  if [[ -z "${_action_id}" ]]
   then
-    printf "No action name specified.\\n" 1>&2
+    printf "No action specified.\\n" 1>&2
     return 1
   fi
 
+  local _action_name
+
+  if [[ ! "${_action_id}" =~ [A-Z] ]]
+  then
+    _action_name="$(_convert_id_to_name "${_action_id}")"
+  else
+    _action_name="${_action_id}"
+  fi
+
+  echo "${_action_name}"
+
   local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}.spotlight-action"
+  echo "${_action_path}"
 
   if [[ ! -d "${_action_path}" ]]
   then
@@ -487,6 +499,9 @@ _list() {
         basename "${__action}" | sed 's|\.[^\.]*$||g'
       )"
 
+      local _id
+      _id="$(_convert_name_to_id "${_basename}")"
+
       local _installed=0
       if [[ -e "${_TARGET_DIRECTORY}/${_basename}.app" ]]
       then
@@ -495,9 +510,9 @@ _list() {
 
       if ((_installed))
       then
-        printf "\"%s\" (installed)\\n" "${_basename}"
+        printf "\"%s\" (installed)\\n" "${_id}"
       else
-        printf "\"%s\"\\n" "${_basename}"
+        printf "\"%s\"\\n" "${_id}"
       fi
     done
   fi
@@ -507,17 +522,26 @@ _list() {
 # _uninstall()
 #
 # Usage:
-#   _uninstall <action>
+#   _uninstall <id>
 #
 # Description:
 #   Uninstall the action with the specified name..
 _uninstall() {
-  local _action_name="${1:-}"
+  local _action_id="${1:-}"
 
-  if [[ -z "${_action_name}" ]]
+  if [[ -z "${_action_id}" ]]
   then
-    printf "No action name specified.\\n" 1>&2
+    printf "No action specified.\\n" 1>&2
     return 1
+  fi
+
+  local _action_name
+
+  if [[ ! "${_action_id}" =~ [A-Z] ]]
+  then
+    _action_name="$(_convert_id_to_name "${_action_id}")"
+  else
+    _action_name="${_action_id}"
   fi
 
   local _action_path="${_ACTIONS_DIRECTORY}/${_action_name}.spotlight-action"
