@@ -8,27 +8,27 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
 
 ## Available Actions
 
-- "Capture Screenshot"
+- Capture Screenshot
   - Capture a screenshot of the full screen.
-- "Capture Interactive Screenshot"
+- Capture Interactive Screenshot
   - Enter interactive screenshot capture mode to take a partial screenshot.
-- "Clear Clipboard"
+- Clear Clipboard
   - Clear the clipboard contents.
-- "Color Picker"
+- Color Picker
   - Open the macOS color chooser.
-- "Lock to Login Window"
+- Lock to Login Window
   - Go to the Login Window, locking the screen.
-- "Log in as"
+- Log in as
   - Log in to user accounts without the fast user switching menu.
-- "Log Out"
+- Log Out
   - Log out of the current user account.
-- "Sleep"
+- Sleep
   - Put the system to sleep.
-- "Strip Clipboard Formatting"
+- Strip Clipboard Formatting
   - Strip formatting from a string on the clipboard.
-- "Toggle Airport Wifi"
+- Toggle Airport Wifi
   - Turn Airport on or off.
-- "Toggle Desktop"
+- Toggle Desktop
   - Show or hide desktop icons.
 
 Spotlight Actions are installed in `/Applications/Spotlight Actions`.
