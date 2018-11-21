@@ -8,6 +8,10 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
 
 ## Available Actions
 
+- "Capture Screenshot"
+  - Capture a screenshot of the full screen.
+- "Capture Interactive Screenshot"
+  - Enter interactive screenshot capture mode to take a partial screenshot.
 - "Clear Clipboard"
   - Clear the clipboard contents.
 - "Color Picker"
