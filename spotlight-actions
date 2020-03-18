@@ -5,7 +5,7 @@
 # Use Spotlight on macOS to trigger actions, such as opening the login window,
 # putting the system to sleep, or logging in as another user.
 #
-# https://github.com/alphabetum/spotlight-actions
+# https://github.com/xwmx/spotlight-actions
 #
 # Copyright (c) 2018 William Melody • hi@williammelody.com
 ###############################################################################

@@ -4,7 +4,7 @@ Use Spotlight on macOS for fast user switching, locking the screen, putting the 
 
 `spotlight-actions` generates single-action apps that can be launched through Spotlight.
 
-![Log in as Example](https://raw.githubusercontent.com/alphabetum/spotlight-actions/master/assets/log-in-as-example.png)
+![Log in as Example](https://raw.githubusercontent.com/xwmx/spotlight-actions/master/assets/log-in-as-example.png)
 
 ## Available Actions
 
